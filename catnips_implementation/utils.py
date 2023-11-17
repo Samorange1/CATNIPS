@@ -3,7 +3,9 @@ params = {
     'world_size' : [10,10,10], #meters
     'scale' : 0.10,    # 1 voxel = s meters 
     'robot_bounding_sphere_diameter' : 0.5, #meters 
-    'purr_threshold' : 10000
+    'purr_threshold' : 10000,
+    'start' : [38,59,42],
+    'end' : [60,56,49]
 }
 
 class Config:

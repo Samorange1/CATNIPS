@@ -22,3 +22,5 @@ pipreqs
 PyMCubes
 raymarching
 Ninja
+dijkstra3d
+connected-components-3d

@@ -22,6 +22,9 @@ class ProbUnsafeRobotRegion:
         self.cell_intensity_grid = None
         self.robot_kernel = None
         self.purr = None
+        self.get_purr()
+        self.start = cfg.start
+        self.end = cfg.end
 
     def get_local_coordinates(self):
         x,y,z = torch.meshgrid(torch.arange(self.grid_size[0]), torch.arange(self.grid_size[1]), torch.arange(self.grid_size[2]), indexing = 'ij')
@@ -113,7 +116,7 @@ class ProbUnsafeRobotRegion:
         # Taking an arbitrary bounding sphere
         grid_size = self.robot_size/self.scale   #voxels
         sphere_radius = self.robot_size/2
-        x, y, z = torch.meshgrid(torch.arange(grid_size), torch.arange(grid_size), torch.arange(grid_size))
+        x, y, z = torch.meshgrid(torch.arange(grid_size), torch.arange(grid_size), torch.arange(grid_size), indexing = 'ij')
 
         # Calculate the distance from each voxel to the sphere center
         distance = torch.sqrt((x - grid_size // 2) ** 2 + (y - grid_size // 2) ** 2 + (z - grid_size // 2) ** 2)
@@ -134,21 +137,33 @@ class ProbUnsafeRobotRegion:
 
         # Threshold:
         self.purr = (self.purr<=self.purr_threshold).float()
+        #Convert to occupancy grid
+        self.purr = (self.purr==0).float()
 
      
 
         
-def visualize(grid):
-    occupied_voxels = grid>=10000
+def visualize(grid,threshold,path = None):
+   
+    occupied_voxels = grid>threshold
     occupied_voxels = occupied_voxels.squeeze().detach().cpu().numpy()
     x, y, z = np.where(occupied_voxels)
+    
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     print("Generating plot")
     # Plot solid cubes for occupied voxels
     for i in range(len(x)):
-        ax.bar3d(x[i], y[i], z[i], dx=1, dy=1, dz=1, shade=True)
+        ax.bar3d(x[i], y[i], z[i], dx=1, dy=1, dz=1, shade=True, color="grey")
     # ax.scatter(x, y, z, color='b', marker='o', label='Occupied Voxels')
+    sx,sy,sz = [38,59,42]
+    ex,ey,ez = [60,56,49]
+    ax.bar3d(sx, sy, sz, dx=1, dy=1, dz=1, shade=True, color="blue")
+    ax.bar3d(ex, ey, ez, dx=1, dy=1, dz=1, shade=True, color="red")
+
+    if path is not None:
+        for i in range(1,path.shape[0]-1):
+            ax.bar3d(path[i,0], path[i,1], path[i,2], dx=1, dy=1, dz=1, shade=True, color="green")
     print("Plot gen Finished")
     # Set labels and title
     ax.set_xlabel('X')
@@ -176,11 +191,13 @@ if __name__ == "__main__":
     print("Model Loaded Successfully")
     purr = ProbUnsafeRobotRegion(cfg, model)
     print("Initialized PURR class")
-    purr.get_purr()
+    # purr.get_purr()
     print("Calcuated PURR")
     print("PURR shape:", purr.cell_intensity_grid.shape)
     print("Max_value: ", torch.max(purr.purr))
-    convert_to_mesh(purr.purr)
+    print("Min value: ", torch.min(purr.purr))
+    # convert_to_mesh(purr.purr)
+    visualize(purr.purr,0)
 
 
     
