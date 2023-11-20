@@ -14,6 +14,13 @@ class CATNIPS:
         self.purr = ProbUnsafeRobotRegion(cfg, model)
         self.start = np.asarray(cfg.start)
         self.end = np.asarray(cfg.end)
+        x = np.array([1,0,0])
+        y = np.array([0,1,0])
+        z = np.array([0,0,1])
+        self.normals = {0:[y,z],
+                        1:[x,z],
+                        2:[x,y]}
+        
     
     def get_a_star_path(self):
         field = self.purr.purr.squeeze().detach().cpu().numpy()
@@ -59,6 +66,58 @@ class CATNIPS:
         lines.append([start,end])
         return lines
 
+    def get_nearest_obstacle_distance(self,voxel, direction):
+        i = 0
+        while i <= self.max_obstacle_distance :
+            next_voxel = voxel + direction
+            if self.purr.purr[next_voxel] == 1:
+                if i == 0:
+                    print("SPECIAL CASE")
+                    i = self.purr.scale/2
+                return i
+            else:
+                i = i+1
+                voxel = next_voxel
+        return i
+    
+    def get_bounding_box_dims(self, line):
+        min_dists = 10 * self.max_obstacle_distance * np.ones((4))
+
+        diff = self.astar_path[line[0],:] - self.astar_path[line[1],:]
+
+        if np.sum(diff) == 0:
+            # TODO: think of a solution for one voxel length lines and one voxel only solutions
+            pass
+
+        dir = np.nonzero(diff)
+        normals = self.normals[dir]
+
+        for i in range(line[0],line[1]+1):
+            voxel = self.astar_path[i,:].copy()
+
+            for idx, normal in enumerate(normals):
+
+                dist1 = self.get_nearest_obstacle_distance(voxel.copy(), normal)
+                
+                if dist1 < min_dists[2*idx]:
+                    min_dists[2*idx] = dist1.copy()
+                
+                dist2 = self.get_nearest_obstacle_distance(voxel.copy(),-1*normal)
+
+                if dist2 < min_dists[2*idx + 1]:
+                    min_dists[2*idx + 1] = dist2.copy()
+        
+        normals_2_stack = np.vstack((normals[1],-normals[1], normals[1], -normals[1]))
+        normals_1_stack = np.vstack((normals[0], normals[0], -normals[0], -normals[0]))
+        dist_1_stack = np.vstack((min_dists[0],min_dists[0],min_dists[1],min_dists[1]))
+        dist_2_stack = np.vstack((min_dists[2], min_dists[3], min_dists[2], min_dists[3]))
+
+
+        corners1 = self.astar_path[line[0],:] + (dist_1_stack * normals_1_stack) + (dist_2_stack * normals_2_stack)
+        corners2 = self.astar_path[line[1],:] + (dist_1_stack * normals_1_stack) + (dist_2_stack * normals_2_stack)
+        corners = np.vstack((corners1,corners2))
+
+        return corners
 
             
 
@@ -75,5 +134,5 @@ if __name__ == "__main__":
     cat.get_a_star_path()
     print("PATH shape: ", cat.astar_path.shape)
     lines = cat.split_path_to_segments()
-    print(lines)
-    # visualize(cat.purr.purr, 0, path)
+    # print(lines)
+    # visualize(cat.purr.purr, 0, cat.astar_path)
