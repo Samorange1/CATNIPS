@@ -8,7 +8,7 @@ from nerf import load__nerf_model
 
 
 class ProbUnsafeRobotRegion:
-    def __init__(self, cfg, model): #TODO: add NERF model as input arg
+    def __init__(self, cfg, model): 
         
         self.world_size = cfg.world_size
         self.scale = cfg.scale
@@ -197,7 +197,9 @@ if __name__ == "__main__":
     print("Max_value: ", torch.max(purr.purr))
     print("Min value: ", torch.min(purr.purr))
     # convert_to_mesh(purr.purr)
-    visualize(purr.purr,0)
+    np.save('cell_intensity', purr.cell_intensity_grid.detach().cpu().numpy()) 
+    np.save('purr',purr.purr.detach().cpu().numpy())
+    # visualize(purr.purr,0)
 
 
     
