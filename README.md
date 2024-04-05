@@ -1,6 +1,7 @@
 # Implementation of Collision Avoidance Through Neural Implicit Probabilistic Scenes 
 
-This repo contains the implementation of the CATNIPS paper. 
+This repo contains the implementation of the CATNIPS paper. [Here](https://github.com/Samorange1/CATNIPS/blob/master/Implementation%20Report.pdf) is the report on the implementation of the CATNIPS algorithm.
+All credits to the authors of [CATNIPS](https://arxiv.org/abs/2302.12931)
 
 ## NeRF Model:
 For this particular implementation, the Stonehenge NeRF model was used. 
