@@ -9,12 +9,14 @@ For this particular implementation, the Stonehenge NeRF model was used.
 
 Results:
 Cell Intensity Grid:
+
 <img width="440" alt="cellintensity" src="https://github.com/Samorange1/CATNIPS/assets/71136335/79dea92a-c6ea-4d81-9981-95c88ac573cd">
 
 
 
 Probabilistic Unsafe Robot Region:
 Voxelized representation:
+
 <img width="307" alt="purr (1)" src="https://github.com/Samorange1/CATNIPS/assets/71136335/19ecc0df-bef0-4494-acce-632c557b9e06">
 
 Mesh Representation of PURR:
