@@ -35,7 +35,7 @@ The final optimized trajectory is in red.
 <img width="677" alt="bezier_geometry" src="https://github.com/Samorange1/CATNIPS/assets/71136335/7f104138-2f3e-4d24-9811-02067cff3c10">
 
 
-In mesh representation:
+Mesh representation:
 ![astar with bezier2](https://github.com/Samorange1/CATNIPS/assets/71136335/05c319ca-af70-40a9-9575-6a59ce2deb4c)
 
 
